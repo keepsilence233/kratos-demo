@@ -6,6 +6,11 @@ import "google/api/annotations.proto";
 
 option go_package = "/api/student/v1;v1";
 
+//1、使用命令新建student.proto
+//kratos proto add api/student/v1/student.proto
+// 2、使用命令生成pb相关代码
+// make api 或者
+// kratos proto client api/student/v1/student.proto
 service Student {
   rpc CreateStudent (CreateStudentRequest) returns (CreateStudentReply);
   rpc UpdateStudent (UpdateStudentRequest) returns (UpdateStudentReply);

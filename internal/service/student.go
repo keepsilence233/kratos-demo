@@ -7,6 +7,8 @@ import (
 	pb "kratos-demo/api/student/v1"
 )
 
+// 通过proto文件 直接生成对应的service代码 使用-t指定生成目录
+// kratos proto server api/helloworld/v1/student.proto -t internal/service
 type StudentService struct {
 	pb.UnimplementedStudentServer
 
