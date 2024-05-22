@@ -3,7 +3,6 @@ package biz
 import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
-	v12 "kratos-demo/api/student/v1"
 )
 
 // 定义 struct Student
@@ -31,13 +30,13 @@ func NewStudentUsercase(repo StudentRepo, logger log.Logger) *StudentUsercase {
 }
 
 // 编写 GetStudent 方法，也就是一些业务逻辑编写 类似DDD中的domain层
-func (uc *StudentUsercase) GetStudent(ctx context.Context, stu *v12.GetStudentRequest) (*v12.GetStudentReply, error) {
+func (uc *StudentUsercase) GetStudent(ctx context.Context, stu *Student) (*Student, error) {
 	uc.log.WithContext(ctx).Infof("GetStudent: %v", stu.Name)
-	_, err := uc.repo.GetStudent(ctx, &Student{Name: stu.Name})
+	s, err := uc.repo.GetStudent(ctx, &Student{Name: stu.Name})
 	if err != nil {
 		return nil, err
 	}
-	return &v12.GetStudentReply{Name: stu.Name}, nil
+	return &Student{Name: s.Name}, nil
 }
 
 // 编写 ListStudent 方法，也就是一些业务逻辑编写

@@ -13,12 +13,12 @@ type studentRepo struct {
 
 func (s *studentRepo) GetStudent(ctx context.Context, student *biz.Student) (*biz.Student, error) {
 	//TODO implement me
-	return &biz.Student{Name: "zhangsan"}, nil
+	return &biz.Student{Name: "lisi"}, nil
 }
 
 func (s *studentRepo) ListStudent(ctx context.Context, student *biz.Student) (*biz.Student, error) {
 	//TODO implement me
-	return &biz.Student{Name: "array"}, nil
+	return nil, nil
 }
 
 func NewstudentRepo(data *Data, logger log.Logger) biz.StudentRepo {
