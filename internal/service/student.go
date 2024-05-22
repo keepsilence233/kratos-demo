@@ -29,11 +29,16 @@ func (s *StudentService) DeleteStudent(ctx context.Context, req *pb.DeleteStuden
 	return &pb.DeleteStudentReply{}, nil
 }
 func (s *StudentService) GetStudent(ctx context.Context, req *pb.GetStudentRequest) (*pb.GetStudentReply, error) {
-	stu, err := s.uc.GetStudent(ctx, &biz.Student{Name: req.Name})
+	stu, err := s.uc.GetStudent(ctx, &biz.Student{ID: req.ID, Name: req.Name})
 	if err != nil {
 		return nil, err
 	}
-	return &pb.GetStudentReply{Name: stu.Name}, nil
+	return &pb.GetStudentReply{
+		ID:     stu.ID,
+		Name:   stu.Name,
+		Status: stu.Status,
+		Info:   stu.Info,
+	}, nil
 }
 func (s *StudentService) ListStudent(ctx context.Context, req *pb.ListStudentRequest) (*pb.ListStudentReply, error) {
 	return &pb.ListStudentReply{}, nil

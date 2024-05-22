@@ -17,7 +17,7 @@ service Student {
   rpc DeleteStudent (DeleteStudentRequest) returns (DeleteStudentReply);
   rpc GetStudent (GetStudentRequest) returns (GetStudentReply){
     option(google.api.http) = {
-      get: "/api/student/getStudent/{name}"
+      get: "/api/student/getStudent/{ID}"
     };
   }
   rpc ListStudent (ListStudentRequest) returns (ListStudentReply){
@@ -37,12 +37,14 @@ message DeleteStudentRequest {}
 message DeleteStudentReply {}
 
 message GetStudentRequest {
-  string name = 1;
+  int32 ID = 1;
+  string name = 2;
 }
 message GetStudentReply {
-  string name = 1;
-  string stu_no = 2;
-  string age = 3;
+  int32 ID = 1;
+  string Name = 2;
+  string Info = 3;
+  int32 Status = 4;
 }
 
 message ListStudentRequest {}

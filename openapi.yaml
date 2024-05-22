@@ -18,15 +18,20 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/student.v1.ListStudentReply'
-    /api/student/getStudent/{name}:
+    /api/student/getStudent/{ID}:
         get:
             tags:
                 - Student
             operationId: Student_GetStudent
             parameters:
-                - name: name
+                - name: ID
                   in: path
                   required: true
+                  schema:
+                    type: integer
+                    format: int32
+                - name: name
+                  in: query
                   schema:
                     type: string
             responses:
@@ -91,12 +96,16 @@ components:
         student.v1.GetStudentReply:
             type: object
             properties:
-                name:
+                ID:
+                    type: integer
+                    format: int32
+                Name:
                     type: string
-                stuNo:
+                Info:
                     type: string
-                age:
-                    type: string
+                Status:
+                    type: integer
+                    format: int32
         student.v1.ListStudentReply:
             type: object
             properties: {}
@@ -104,3 +113,9 @@ tags:
     - name: Greeter
       description: The greeting service definition.
     - name: Student
+      description: |-
+        1、使用命令新建student.proto
+        kratos proto add api/student/v1/student.proto
+         2、使用命令生成pb相关代码
+         make api 或者
+         kratos proto client api/student/v1/student.proto
