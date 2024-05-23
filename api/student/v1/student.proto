@@ -12,9 +12,23 @@ option go_package = "/api/student/v1;v1";
 // make api 或者
 // kratos proto client api/student/v1/student.proto
 service Student {
-  rpc CreateStudent (CreateStudentRequest) returns (CreateStudentReply);
-  rpc UpdateStudent (UpdateStudentRequest) returns (UpdateStudentReply);
-  rpc DeleteStudent (DeleteStudentRequest) returns (DeleteStudentReply);
+  rpc CreateStudent (CreateStudentRequest) returns (CreateStudentReply){
+    option(google.api.http) = {
+      post: "/api/student/createStudent"
+      body: "*"
+    };
+  }
+  rpc UpdateStudent (UpdateStudentRequest) returns (UpdateStudentReply){
+    option(google.api.http) = {
+      patch: "/api/student/updateStudent"
+      body: "*"
+    };
+  }
+  rpc DeleteStudent (DeleteStudentRequest) returns (DeleteStudentReply){
+    option(google.api.http) = {
+      delete: "/api/student/deleteStudent/{ID}"
+    };
+  }
   rpc GetStudent (GetStudentRequest) returns (GetStudentReply){
     option(google.api.http) = {
       get: "/api/student/getStudent/{ID}"
@@ -27,14 +41,40 @@ service Student {
   }
 }
 
-message CreateStudentRequest {}
-message CreateStudentReply {}
+message CreateStudentRequest {
+  string Name = 2;
+  string Info = 3;
+  int32 Status = 4;
+}
+message CreateStudentReply {
+  int32 ID = 1;
+  string Name = 2;
+  string Info = 3;
+  int32 Status = 4;
+}
 
-message UpdateStudentRequest {}
-message UpdateStudentReply {}
+message UpdateStudentRequest {
+  int32 ID = 1;
+  string Name = 2;
+  string Info = 3;
+  int32 Status = 4;
+}
+message UpdateStudentReply {
+  int32 ID = 1;
+  string Name = 2;
+  string Info = 3;
+  int32 Status = 4;
+}
 
-message DeleteStudentRequest {}
-message DeleteStudentReply {}
+message DeleteStudentRequest {
+  int32 ID = 1;
+}
+message DeleteStudentReply {
+  int32 ID = 1;
+  string Name = 2;
+  string Info = 3;
+  int32 Status = 4;
+}
 
 message GetStudentRequest {
   int32 ID = 1;
@@ -45,7 +85,30 @@ message GetStudentReply {
   string Name = 2;
   string Info = 3;
   int32 Status = 4;
+  string UpdatedAt = 5;
+  string CreatedAt = 6;
 }
 
-message ListStudentRequest {}
-message ListStudentReply {}
+message ListStudentRequest {
+  int32 pageNo = 1;
+  int32 pageSize = 2;
+  int32 id = 3;
+  string name = 4;
+  string info = 5;
+  int32 status = 6;
+}
+message ListStudentReply {
+  int64 totalCount = 1;
+  int32 pageNo = 2;
+  int32 pageSize = 3;
+  int32 errCode = 4;
+  int32 errMsg = 5;
+  repeated StudentReply data = 6;
+}
+
+message StudentReply{
+  int32 ID = 1;
+  string Name = 2;
+  string Info = 3;
+  int32 Status = 4;
+}

@@ -6,11 +6,77 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/student/createStudent:
+        post:
+            tags:
+                - Student
+            operationId: Student_CreateStudent
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/student.v1.CreateStudentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/student.v1.CreateStudentReply'
+    /api/student/deleteStudent/{ID}:
+        delete:
+            tags:
+                - Student
+            operationId: Student_DeleteStudent
+            parameters:
+                - name: ID
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/student.v1.DeleteStudentReply'
     /api/student/getStuList:
         get:
             tags:
                 - Student
             operationId: Student_ListStudent
+            parameters:
+                - name: pageNo
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: id
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: info
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
             responses:
                 "200":
                     description: OK
@@ -41,6 +107,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/student.v1.GetStudentReply'
+    /api/student/updateStudent:
+        patch:
+            tags:
+                - Student
+            operationId: Student_UpdateStudent
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/student.v1.UpdateStudentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/student.v1.UpdateStudentReply'
     /helloworld/{name}:
         get:
             tags:
@@ -93,6 +177,42 @@ components:
                 name:
                     type: string
             description: The request message containing the user's name.
+        student.v1.CreateStudentReply:
+            type: object
+            properties:
+                ID:
+                    type: integer
+                    format: int32
+                Name:
+                    type: string
+                Info:
+                    type: string
+                Status:
+                    type: integer
+                    format: int32
+        student.v1.CreateStudentRequest:
+            type: object
+            properties:
+                Name:
+                    type: string
+                Info:
+                    type: string
+                Status:
+                    type: integer
+                    format: int32
+        student.v1.DeleteStudentReply:
+            type: object
+            properties:
+                ID:
+                    type: integer
+                    format: int32
+                Name:
+                    type: string
+                Info:
+                    type: string
+                Status:
+                    type: integer
+                    format: int32
         student.v1.GetStudentReply:
             type: object
             properties:
@@ -106,9 +226,70 @@ components:
                 Status:
                     type: integer
                     format: int32
+                UpdatedAt:
+                    type: string
+                CreatedAt:
+                    type: string
         student.v1.ListStudentReply:
             type: object
-            properties: {}
+            properties:
+                totalCount:
+                    type: string
+                pageNo:
+                    type: integer
+                    format: int32
+                pageSize:
+                    type: integer
+                    format: int32
+                errCode:
+                    type: integer
+                    format: int32
+                errMsg:
+                    type: integer
+                    format: int32
+                data:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/student.v1.StudentReply'
+        student.v1.StudentReply:
+            type: object
+            properties:
+                ID:
+                    type: integer
+                    format: int32
+                Name:
+                    type: string
+                Info:
+                    type: string
+                Status:
+                    type: integer
+                    format: int32
+        student.v1.UpdateStudentReply:
+            type: object
+            properties:
+                ID:
+                    type: integer
+                    format: int32
+                Name:
+                    type: string
+                Info:
+                    type: string
+                Status:
+                    type: integer
+                    format: int32
+        student.v1.UpdateStudentRequest:
+            type: object
+            properties:
+                ID:
+                    type: integer
+                    format: int32
+                Name:
+                    type: string
+                Info:
+                    type: string
+                Status:
+                    type: integer
+                    format: int32
 tags:
     - name: Greeter
       description: The greeting service definition.

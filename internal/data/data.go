@@ -3,6 +3,7 @@ package data
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"kratos-demo/internal/conf"
 	"time"
 
@@ -25,7 +26,9 @@ type Data struct {
 // 第 2 步初始化 gorm
 func NewGormDB(c *conf.Data) (*gorm.DB, error) {
 	dsn := c.Database.Source
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -48,4 +51,20 @@ func NewData(logger log.Logger, db *gorm.DB) (*Data, func(), error) {
 	}
 
 	return &Data{gormDB: db}, cleanup, nil
+}
+
+func Paginate(pageNo int32, pageSize int32) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		if pageNo == 0 {
+			pageNo = 1
+		}
+		switch {
+		case pageSize > 100:
+			pageSize = 100
+		case pageSize <= 0:
+			pageSize = 10
+		}
+		offset := (pageNo - 1) * pageSize
+		return db.Offset(int(offset)).Limit(int(pageSize))
+	}
 }
