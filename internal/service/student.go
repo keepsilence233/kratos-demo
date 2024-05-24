@@ -76,8 +76,8 @@ func (s *StudentService) GetStudent(ctx context.Context, req *pb.GetStudentReque
 		Name:      stu.Name,
 		Status:    stu.Status,
 		Info:      stu.Info,
-		UpdatedAt: stu.UpdatedAt.String(),
-		CreatedAt: stu.CreatedAt.String(),
+		UpdatedAt: stu.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt: stu.CreatedAt.Format("2006-01-02 15:04:05"),
 	}, nil
 }
 func (s *StudentService) ListStudent(ctx context.Context, req *pb.ListStudentRequest) (*pb.ListStudentReply, error) {
