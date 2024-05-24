@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"github.com/acmestack/gorm-plus/gplus"
 	"github.com/go-kratos/kratos/v2/log"
 	"kratos-demo/internal/biz"
 )
@@ -44,22 +45,44 @@ func (s *studentRepo) UpdateStudent(ctx context.Context, student *biz.Student) e
 	return nil
 }
 
+//func (s *studentRepo) ListStudent(ctx context.Context,
+//	pageInfo *biz.PageInfo, queryParams *biz.Student) ([]*biz.Student, *biz.PageInfo, error) {
+//
+//	skuList := make([]*biz.Student, 0)
+//	var totalCount int64
+//
+//	s.data.gormDB.Scopes(Paginate(pageInfo.PageNo, pageInfo.PageSize)).
+//		Where(queryParams).Find(&skuList)
+//	//Where("id = ? and name like ? and info = ? and status = ?",
+//	//	queryParams.ID, queryParams.Name+WHERE_LIKE, queryParams.Info, queryParams.Status).Find(&skuList)
+//	s.data.gormDB.Model(&biz.Student{}).Count(&totalCount)
+//
+//	return skuList, &biz.PageInfo{
+//		PageNo:     pageInfo.PageNo,
+//		PageSize:   pageInfo.PageSize,
+//		TotalCount: totalCount,
+//	}, nil
+//}
+
 func (s *studentRepo) ListStudent(ctx context.Context,
 	pageInfo *biz.PageInfo, queryParams *biz.Student) ([]*biz.Student, *biz.PageInfo, error) {
 
-	skuList := make([]*biz.Student, 0)
-	var totalCount int64
+	query, u := gplus.NewQuery[biz.Student]()
+	page := gplus.NewPage[biz.Student](int(pageInfo.PageNo), int(pageInfo.PageSize))
 
-	s.data.gormDB.Scopes(Paginate(pageInfo.PageNo, pageInfo.PageSize)).
-		Where(queryParams).Find(&skuList)
-	//Where("id = ? and name like ? and info = ? and status = ?",
-	//	queryParams.ID, queryParams.Name+WHERE_LIKE, queryParams.Info, queryParams.Status).Find(&skuList)
-	s.data.gormDB.Model(&biz.Student{}).Count(&totalCount)
+	if queryParams.Name != "" {
+		query.LikeRight(&u.Name, queryParams.Name)
+	}
+	if queryParams.Status > 0 {
+		query.Eq(&u.Status, queryParams.Status)
+	}
 
-	return skuList, &biz.PageInfo{
-		PageNo:     pageInfo.PageNo,
-		PageSize:   pageInfo.PageSize,
-		TotalCount: totalCount,
+	page, _ = gplus.SelectPage(page, query)
+
+	return page.Records, &biz.PageInfo{
+		PageNo:     int32(page.Current),
+		PageSize:   int32(page.Size),
+		TotalCount: page.Total,
 	}, nil
 }
 

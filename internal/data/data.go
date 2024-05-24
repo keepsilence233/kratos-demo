@@ -1,6 +1,7 @@
 package data
 
 import (
+	"github.com/acmestack/gorm-plus/gplus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -40,6 +41,8 @@ func NewGormDB(c *conf.Data) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(50)
 	sqlDB.SetMaxOpenConns(150)
 	sqlDB.SetConnMaxLifetime(time.Second * 25)
+
+	gplus.Init(db)
 	return db, err
 }
 
