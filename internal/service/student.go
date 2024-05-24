@@ -88,14 +88,14 @@ func (s *StudentService) ListStudent(ctx context.Context, req *pb.ListStudentReq
 		return nil, err
 	}
 
-	var studentReplyList []*pb.StudentReply
-	for _, student := range skuList {
-		studentReplyList = append(studentReplyList, &pb.StudentReply{
+	var studentReplyList = make([]*pb.StudentReply, len(skuList))
+	for index, student := range skuList {
+		studentReplyList[index] = &pb.StudentReply{
 			ID:     student.ID,
 			Name:   student.Name,
 			Info:   student.Info,
 			Status: student.Status,
-		})
+		}
 	}
 
 	return &pb.ListStudentReply{
