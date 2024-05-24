@@ -4,6 +4,7 @@ import (
 	"context"
 	pb "kratos-demo/api/student/v1"
 	"kratos-demo/internal/biz"
+	"kratos-demo/internal/model"
 )
 
 // 通过proto文件 直接生成对应的service代码 使用-t指定生成目录
@@ -19,7 +20,7 @@ func NewStudentService(uc *biz.StudentUsercase) *StudentService {
 }
 
 func (s *StudentService) CreateStudent(ctx context.Context, req *pb.CreateStudentRequest) (*pb.CreateStudentReply, error) {
-	stu, err := s.uc.CreateStudent(ctx, &biz.Student{
+	stu, err := s.uc.CreateStudent(ctx, &model.Student{
 		Name:   req.Name,
 		Info:   req.Info,
 		Status: req.Status,
@@ -41,7 +42,7 @@ func (s *StudentService) UpdateStudent(ctx context.Context, req *pb.UpdateStuden
 		return nil, err
 	}
 
-	updStu, err := s.uc.UpdateStudent(ctx, &biz.Student{
+	updStu, err := s.uc.UpdateStudent(ctx, &model.Student{
 		ID:     req.ID,
 		Name:   req.Name,
 		Status: req.Status,
@@ -56,7 +57,7 @@ func (s *StudentService) UpdateStudent(ctx context.Context, req *pb.UpdateStuden
 	}, err
 }
 func (s *StudentService) DeleteStudent(ctx context.Context, req *pb.DeleteStudentRequest) (*pb.DeleteStudentReply, error) {
-	err := s.uc.DeleteStudent(ctx, &biz.Student{
+	err := s.uc.DeleteStudent(ctx, &model.Student{
 		ID: req.ID,
 	})
 	if err != nil {
@@ -66,7 +67,7 @@ func (s *StudentService) DeleteStudent(ctx context.Context, req *pb.DeleteStuden
 	return &pb.DeleteStudentReply{}, nil
 }
 func (s *StudentService) GetStudent(ctx context.Context, req *pb.GetStudentRequest) (*pb.GetStudentReply, error) {
-	stu, err := s.uc.GetStudent(ctx, &biz.Student{ID: req.ID, Name: req.Name})
+	stu, err := s.uc.GetStudent(ctx, &model.Student{ID: req.ID, Name: req.Name})
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +83,7 @@ func (s *StudentService) GetStudent(ctx context.Context, req *pb.GetStudentReque
 func (s *StudentService) ListStudent(ctx context.Context, req *pb.ListStudentRequest) (*pb.ListStudentReply, error) {
 	skuList, pageInfo, err := s.uc.ListStudent(ctx,
 		&biz.PageInfo{PageNo: req.PageNo, PageSize: req.PageSize},
-		&biz.Student{ID: req.Id, Name: req.Name, Info: req.Info, Status: req.Status})
+		&model.Student{ID: req.Id, Name: req.Name, Info: req.Info, Status: req.Status})
 	if err != nil {
 		return nil, err
 	}
