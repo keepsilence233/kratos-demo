@@ -35,7 +35,25 @@ func (s *StudentService) CreateStudent(ctx context.Context, req *pb.CreateStuden
 	}, nil
 }
 func (s *StudentService) UpdateStudent(ctx context.Context, req *pb.UpdateStudentRequest) (*pb.UpdateStudentReply, error) {
-	return &pb.UpdateStudentReply{}, nil
+
+	stuReply, err := s.GetStudent(ctx, &pb.GetStudentRequest{ID: req.ID})
+	if stuReply == nil {
+		return nil, err
+	}
+
+	updStu, err := s.uc.UpdateStudent(ctx, &biz.Student{
+		ID:     req.ID,
+		Name:   req.Name,
+		Status: req.Status,
+		Info:   req.Info,
+	})
+
+	return &pb.UpdateStudentReply{
+		ID:     updStu.ID,
+		Name:   updStu.Name,
+		Status: updStu.Status,
+		Info:   updStu.Info,
+	}, err
 }
 func (s *StudentService) DeleteStudent(ctx context.Context, req *pb.DeleteStudentRequest) (*pb.DeleteStudentReply, error) {
 	err := s.uc.DeleteStudent(ctx, &biz.Student{
@@ -44,6 +62,7 @@ func (s *StudentService) DeleteStudent(ctx context.Context, req *pb.DeleteStuden
 	if err != nil {
 		return nil, err
 	}
+
 	return &pb.DeleteStudentReply{}, nil
 }
 func (s *StudentService) GetStudent(ctx context.Context, req *pb.GetStudentRequest) (*pb.GetStudentReply, error) {
@@ -52,11 +71,10 @@ func (s *StudentService) GetStudent(ctx context.Context, req *pb.GetStudentReque
 		return nil, err
 	}
 	return &pb.GetStudentReply{
-		ID:     stu.ID,
-		Name:   stu.Name,
-		Status: stu.Status,
-		Info:   stu.Info,
-		//UpdatedAt: strconv.FormatInt(stu.CreatedAt.Unix(), 10),
+		ID:        stu.ID,
+		Name:      stu.Name,
+		Status:    stu.Status,
+		Info:      stu.Info,
 		UpdatedAt: stu.UpdatedAt.String(),
 		CreatedAt: stu.CreatedAt.String(),
 	}, nil

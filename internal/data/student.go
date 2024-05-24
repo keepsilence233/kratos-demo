@@ -6,6 +6,10 @@ import (
 	"kratos-demo/internal/biz"
 )
 
+var (
+	WHERE_LIKE = "%"
+)
+
 type studentRepo struct {
 	data *Data
 	log  *log.Helper
@@ -35,19 +39,21 @@ func (s *studentRepo) DeleteStudent(ctx context.Context, student *biz.Student) e
 	return nil
 }
 
+func (s *studentRepo) UpdateStudent(ctx context.Context, student *biz.Student) error {
+	s.data.gormDB.Model(&student).Updates(biz.Student{Name: student.Name, Info: student.Info, Status: student.Status})
+	return nil
+}
+
 func (s *studentRepo) ListStudent(ctx context.Context,
-	pageInfo *biz.PageInfo, student *biz.Student) ([]*biz.Student, *biz.PageInfo, error) {
+	pageInfo *biz.PageInfo, queryParams *biz.Student) ([]*biz.Student, *biz.PageInfo, error) {
 
 	skuList := make([]*biz.Student, 0)
 	var totalCount int64
 
-	queryParams := biz.Student{
-		ID:     student.ID,
-		Name:   student.Name,
-		Info:   student.Info,
-		Status: student.Status,
-	}
-	s.data.gormDB.Scopes(Paginate(pageInfo.PageNo, pageInfo.PageSize)).Where(queryParams).Find(&skuList)
+	s.data.gormDB.Scopes(Paginate(pageInfo.PageNo, pageInfo.PageSize)).
+		Where(queryParams).Find(&skuList)
+	//Where("id = ? and name like ? and info = ? and status = ?",
+	//	queryParams.ID, queryParams.Name+WHERE_LIKE, queryParams.Info, queryParams.Status).Find(&skuList)
 	s.data.gormDB.Model(&biz.Student{}).Count(&totalCount)
 
 	return skuList, &biz.PageInfo{

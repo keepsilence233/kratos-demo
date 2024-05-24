@@ -23,6 +23,7 @@ type StudentRepo interface {
 	CreateStudent(context.Context, *Student) (*Student, error)
 	GetStudent(context.Context, *Student) (*Student, error)
 	DeleteStudent(context.Context, *Student) error
+	UpdateStudent(context.Context, *Student) error
 	ListStudent(context.Context, *PageInfo, *Student) ([]*Student, *PageInfo, error)
 }
 
@@ -55,12 +56,21 @@ func (uc *StudentUsercase) GetStudent(ctx context.Context, stu *Student) (*Stude
 	return s, nil
 }
 
+func (uc *StudentUsercase) UpdateStudent(ctx context.Context, stu *Student) (*Student, error) {
+	err := uc.repo.UpdateStudent(ctx, stu)
+	if err != nil {
+		return nil, err
+	}
+	stu, err = uc.GetStudent(ctx, stu)
+	return stu, nil
+}
+
 func (uc *StudentUsercase) DeleteStudent(ctx context.Context, stu *Student) error {
 	return uc.repo.DeleteStudent(ctx, &Student{ID: stu.ID})
 }
 
 func (uc *StudentUsercase) ListStudent(ctx context.Context, pageInfo *PageInfo, stu *Student) ([]*Student, *PageInfo, error) {
-	s, pageInfo, err := uc.repo.ListStudent(ctx, pageInfo, &Student{ID: stu.ID})
+	s, pageInfo, err := uc.repo.ListStudent(ctx, pageInfo, stu)
 	if err != nil {
 		return nil, nil, err
 	}
