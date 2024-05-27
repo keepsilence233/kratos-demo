@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -8,6 +9,8 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"io"
+	"net/http"
 	"time"
 )
 
@@ -79,9 +82,17 @@ func (gc *GinUsecase) SaveExcelAccountData(c *gin.Context, xlsxFile *excelize.Fi
 		return err
 	}
 
-	//todo
 	saveDataStr, err := json.Marshal(saveData)
 	fmt.Printf(fmt.Sprintf("解析成功保存账户数据: %v", string(saveDataStr)))
+
+	//resp, err := http.Get("http://127.0.0.1:8080/api/student/getStudent/1")
+	//defer resp.Body.Close()
+	//body, err := io.ReadAll(resp.Body)
+
+	err = gc.callXBaseCreateAccount(saveData)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -125,4 +136,31 @@ func (gc *GinUsecase) parseRow(row []string) Account {
 		CreateAt:         time.Now(),
 		UpdateAt:         time.Now(),
 	}
+}
+func (gc *GinUsecase) callXBaseCreateAccount(accounts []*Account) error {
+
+	_, err := json.Marshal(accounts)
+	if err != nil {
+		return err
+	}
+	var data = "{\n    \"Name\":\"wangwu1\",\n    \"Info\":\"wangwu1-info2\",\n    \"Status\":\"123424\"\n}"
+	req, err := http.NewRequest(http.MethodPost, "http://localhost:8080/api/student/createStudent", bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf(fmt.Sprintf("请求创建用户接口返回信息: %v", string(body)))
+
+	return nil
 }
