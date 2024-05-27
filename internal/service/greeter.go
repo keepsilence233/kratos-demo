@@ -12,6 +12,9 @@ type GreeterService struct {
 	v1.UnimplementedGreeterServer
 
 	uc *biz.GreeterUsecase
+
+	// Notice gin_http要用GreeterService中的GinUsecase,需要把Gc设置成外部可调用的
+	Gc *biz.GinUsecase
 }
 
 // NewGreeterService new a greeter service.

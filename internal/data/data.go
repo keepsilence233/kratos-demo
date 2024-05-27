@@ -14,7 +14,7 @@ import (
 
 // 第 4 步，用 wire 注入代码，修改 原来的 NewSet
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewGreeterRepo, NewGormDB, NewstudentRepo)
+var ProviderSet = wire.NewSet(NewData, NewGreeterRepo, NewGormDB, NewstudentRepo, NewGinRepo)
 
 // Data .
 // 第 1 步引入 *gorm.DB
