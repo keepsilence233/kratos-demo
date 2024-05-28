@@ -1,26 +1,52 @@
 package server
 
 import (
+	"context"
+	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/selector"
 	v1 "kratos-demo/api/helloworld/v1"
 	stu "kratos-demo/api/student/v1"
 	"kratos-demo/internal/conf"
+	"kratos-demo/internal/pkg/middleware/auth"
 	"kratos-demo/internal/service"
 	"kratos-demo/internal/service_gin"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/gorilla/handlers"
 )
 
+func NewWhiteListMatcher() selector.MatchFunc {
+
+	whiteList := make(map[string]struct{})
+	//whiteList["/shop.interface.v1.ShopInterface/Login"] = struct{}{}
+	//whiteList["/shop.interface.v1.ShopInterface/Register"] = struct{}{}
+	whiteList["/student.v1.Student/GetStudent"] = struct{}{}
+	return func(ctx context.Context, operation string) bool {
+		if _, ok := whiteList[operation]; ok {
+			return false
+		}
+		return true
+	}
+}
+
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server,
-	greeter *service.GreeterService,
-	student *service.StudentService,
-	ginSrv *service_gin.GinService,
-	logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, student *service.StudentService,
+	ginSrv *service_gin.GinService, logger log.Logger, jwtc *conf.JWT) *http.Server {
 	var opts = []http.ServerOption{
+
 		http.Middleware(
 			recovery.Recovery(),
+			selector.Server(auth.JWTAuth(jwtc.Secret)).Match(NewWhiteListMatcher()).Build(),
+			logging.Server(logger),
+		),
+		http.Filter(
+			handlers.CORS(
+				handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+				handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS", "DELETE"}),
+				handlers.AllowedOrigins([]string{"*"}),
+			),
 		),
 	}
 	if c.Http.Network != "" {

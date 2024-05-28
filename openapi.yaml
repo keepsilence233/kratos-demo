@@ -230,6 +230,8 @@ components:
                     type: string
                 CreatedAt:
                     type: string
+                Token:
+                    type: string
         student.v1.ListStudentReply:
             type: object
             properties:

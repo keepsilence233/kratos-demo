@@ -87,6 +87,7 @@ message GetStudentReply {
   int32 Status = 4;
   string UpdatedAt = 5;
   string CreatedAt = 6;
+  string Token = 7;
 }
 
 message ListStudentRequest {

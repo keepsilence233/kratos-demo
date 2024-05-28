@@ -5,7 +5,9 @@ package biz
 import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
+	"kratos-demo/internal/conf"
 	"kratos-demo/internal/model"
+	"kratos-demo/internal/pkg/middleware/auth"
 )
 
 // StudentRepo 定义对 struct model.Student 的操作接口：
@@ -21,11 +23,16 @@ type StudentRepo interface {
 type StudentUsercase struct {
 	repo StudentRepo
 	log  *log.Helper
+	jwt  *conf.JWT
 }
 
 // NewStudentUsercase 初始化 StudentUsercase
-func NewStudentUsercase(repo StudentRepo, logger log.Logger) *StudentUsercase {
-	return &StudentUsercase{repo: repo, log: log.NewHelper(logger)}
+func NewStudentUsercase(repo StudentRepo, logger log.Logger, jwtc *conf.JWT) *StudentUsercase {
+	return &StudentUsercase{repo: repo, log: log.NewHelper(logger), jwt: jwtc}
+}
+
+func (uc *StudentUsercase) generateToken(stuId int32) string {
+	return auth.GenerateToken(uc.jwt.Secret, stuId)
 }
 
 func (uc *StudentUsercase) CreateStudent(ctx context.Context, stu *model.Student) (*model.Student, error) {
@@ -43,6 +50,7 @@ func (uc *StudentUsercase) GetStudent(ctx context.Context, stu *model.Student) (
 	if err != nil {
 		return nil, err
 	}
+	s.Token = uc.generateToken(s.ID)
 	return s, nil
 }
 

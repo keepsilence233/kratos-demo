@@ -10,4 +10,5 @@ type Student struct {
 	Status    int32
 	UpdatedAt time.Time
 	CreatedAt time.Time
+	Token     string
 }
