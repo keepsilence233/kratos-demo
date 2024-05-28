@@ -9,8 +9,11 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
+	"github.com/tealeg/xlsx"
 	"io"
+	"kratos-demo/internal/common"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -77,9 +80,14 @@ func (gc *GinUsecase) SaveExcelAccountData(c *gin.Context, xlsxFile *excelize.Fi
 	}
 
 	if errData != nil {
-		errDataStr, err := json.Marshal(saveData)
+		errDataStr, _ := json.Marshal(saveData)
 		fmt.Printf(fmt.Sprintf("解析成功异常数据: %v", string(errDataStr)))
-		return err
+		err := ToExcel([]string{`序号`, `姓名`, `性别`, `身份证号码`,
+			`省`, `市`, `县`, `单位`, `社会信用代码`, `电话`}, errData,
+			"/Users/chinese.youth/github/kratos/kratos-demo/errorData"+time.Now().String()+".xlsx")
+		if err != nil {
+			return err
+		}
 	}
 
 	saveDataStr, err := json.Marshal(saveData)
@@ -89,9 +97,19 @@ func (gc *GinUsecase) SaveExcelAccountData(c *gin.Context, xlsxFile *excelize.Fi
 	//defer resp.Body.Close()
 	//body, err := io.ReadAll(resp.Body)
 
-	err = gc.callXBaseCreateAccount(saveData)
-	if err != nil {
-		return err
+	if len(saveData) <= 100 {
+		err = gc.callXBaseCreateAccount(saveData)
+		if err != nil {
+			return err
+		}
+	} else {
+		splitAccounts := common.SplitSlice(saveData, 100)
+		for _, saveData := range splitAccounts {
+			err = gc.callXBaseCreateAccount(saveData)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
@@ -162,5 +180,45 @@ func (gc *GinUsecase) callXBaseCreateAccount(accounts []*Account) error {
 
 	fmt.Printf(fmt.Sprintf("请求创建用户接口返回信息: %v", string(body)))
 
+	return nil
+}
+
+// 生成io.ReadSeeker  参数 titleList 为Excel表头，dataList 为数据
+func ToExcel(titleList []string, dataList []*Account, filePath string) error {
+	// 生成一个新的文件
+	file := xlsx.NewFile()
+	// 添加sheet页
+	sheet, _ := file.AddSheet("Sheet1")
+	// 插入表头
+	titleRow := sheet.AddRow()
+	for _, v := range titleList {
+		cell := titleRow.AddCell()
+		cell.Value = v
+	}
+	// 插入内容
+	for _, data := range dataList {
+		row := sheet.AddRow()
+		//row.WriteStruct(v, -1)
+		row.AddCell().Value = strconv.Itoa(int(data.Id))
+		row.AddCell().Value = data.Name
+		row.AddCell().Value = data.Gender
+		row.AddCell().Value = data.IdCard
+		row.AddCell().Value = data.Province
+		row.AddCell().Value = data.City
+		row.AddCell().Value = data.Region
+		row.AddCell().Value = data.Company
+		row.AddCell().Value = data.SocialCreditCode
+		row.AddCell().Value = data.Phone
+	}
+
+	//var buffer bytes.Buffer
+	//_ = file.Write(&buffer)
+	//content = bytes.NewReader(buffer.Bytes())
+
+	// 将文件写入指定路径
+	err := file.Save(filePath)
+	if err != nil {
+		return err
+	}
 	return nil
 }
